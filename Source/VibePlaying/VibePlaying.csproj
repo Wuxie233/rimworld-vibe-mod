@@ -12,46 +12,16 @@
   </PropertyGroup>
 
   <!--
-    RimWorld DLL references.
-    Set RIMWORLD_DIR environment variable or edit the path below.
-    Default: Steam install path.
+    Use Krafs.Rimworld.Ref NuGet package for compile-time references.
+    No local RimWorld installation required.
+    If you have the game installed and want to use local DLLs instead,
+    replace the PackageReference below with manual Reference items.
   -->
-  <PropertyGroup>
-    <RimWorldDir Condition="'$(RIMWORLD_DIR)' != ''">$(RIMWORLD_DIR)</RimWorldDir>
-    <RimWorldDir Condition="'$(RimWorldDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\RimWorld</RimWorldDir>
-    <RimWorldManagedDir>$(RimWorldDir)\RimWorldWin64_Data\Managed</RimWorldManagedDir>
-  </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(RimWorldManagedDir)\Assembly-CSharp.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(RimWorldManagedDir)\UnityEngine.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(RimWorldManagedDir)\UnityEngine.CoreModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(RimWorldManagedDir)\UnityEngine.IMGUIModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(RimWorldManagedDir)\UnityEngine.TextRenderingModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.3.3">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.4104" ExcludeAssets="runtime" />
+    <PackageReference Include="Lib.Harmony" Version="2.3.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" ExcludeAssets="runtime" />
   </ItemGroup>
 
 </Project>

@@ -17,7 +17,6 @@ namespace VibePlaying
     {
         private string inputText = "";
         private Vector2 scrollPos;
-        private int selectedHistory = -1;
 
         public override Vector2 InitialSize => new Vector2(700f, 600f);
 
