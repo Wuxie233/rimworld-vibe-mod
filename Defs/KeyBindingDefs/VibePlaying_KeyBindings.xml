@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <KeyBindingCategoryDef>
+    <defName>VibePlaying_Keys</defName>
+    <label>Vibe Playing</label>
+  </KeyBindingCategoryDef>
+
+  <KeyBindingDef>
+    <defName>VibePlaying_OpenWindow</defName>
+    <category>VibePlaying_Keys</category>
+    <label>Open Vibe Playing window</label>
+    <defaultKeyCodeA>F8</defaultKeyCodeA>
+  </KeyBindingDef>
+
+  <KeyBindingDef>
+    <defName>VibePlaying_QuickAnalyze</defName>
+    <category>VibePlaying_Keys</category>
+    <label>Quick analyze colony</label>
+    <defaultKeyCodeA>F9</defaultKeyCodeA>
+  </KeyBindingDef>
+</Defs>

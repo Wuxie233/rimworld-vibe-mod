@@ -19,6 +19,8 @@ namespace VibePlaying
         private readonly List<ExecutionLogEntry> executionLog = new List<ExecutionLogEntry>();
         private readonly CommandExecutor executor = new CommandExecutor();
         private readonly SafetyCounter safetyCounter = new SafetyCounter();
+        private List<ExecutionLogEntry> executionLogSave;
+        private List<AnalysisRecord> historySave;
 
         public IReadOnlyList<AnalysisRecord> History => history;
         public IReadOnlyList<ProposedAction> PendingActions => pendingActions;
@@ -26,16 +28,42 @@ namespace VibePlaying
         public SafetyCounter Safety => safetyCounter;
         public bool IsAnalyzing => analysisInProgress;
         public string CurrentStrategy = "";
+        private string pendingEventPrompt;
+        private int eventAnalysisTick = -1;
+        private const int EventDelayTicks = 300; // ~5 seconds at normal speed
 
         public VibePlayingComponent(Game game) { }
 
+        /// <summary>
+        /// Queue an event-triggered analysis with a short delay.
+        /// This avoids analyzing mid-spawn (e.g. raid pawns still arriving).
+        /// </summary>
+        public void QueueEventAnalysis(string prompt)
+        {
+            if (analysisInProgress) return;
+            pendingEventPrompt = prompt;
+            eventAnalysisTick = Find.TickManager.TicksGame + EventDelayTicks;
+        }
+
         public override void GameComponentTick()
         {
-            if (!VibePlayingMod.Settings.autoAnalyze) return;
             if (analysisInProgress) return;
 
-            int intervalTicks = VibePlayingMod.Settings.analysisCycleDays * 60000;
             int currentTick = Find.TickManager.TicksGame;
+
+            // Fire queued event analysis after delay
+            if (pendingEventPrompt != null && currentTick >= eventAnalysisTick)
+            {
+                var prompt = pendingEventPrompt;
+                pendingEventPrompt = null;
+                eventAnalysisTick = -1;
+                TriggerAnalysis(prompt);
+                return;
+            }
+
+            if (!VibePlayingMod.Settings.autoAnalyze) return;
+
+            int intervalTicks = VibePlayingMod.Settings.analysisCycleDays * 60000;
 
             // Reset safety counters at cycle boundary
             safetyCounter.ResetIfNewCycle(currentTick, intervalTicks);
@@ -194,24 +222,63 @@ namespace VibePlaying
         {
             Scribe_Values.Look(ref lastAnalysisTick, "lastAnalysisTick", -1);
             Scribe_Values.Look(ref CurrentStrategy, "currentStrategy", "");
+            Scribe_Collections.Look(ref executionLogSave, "executionLog", LookMode.Deep);
+            Scribe_Collections.Look(ref historySave, "history", LookMode.Deep);
+
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                if (executionLogSave != null)
+                {
+                    executionLog.Clear();
+                    executionLog.AddRange(executionLogSave);
+                }
+                if (historySave != null)
+                {
+                    history.Clear();
+                    history.AddRange(historySave);
+                }
+            }
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                executionLogSave = new List<ExecutionLogEntry>(executionLog);
+                historySave = new List<AnalysisRecord>(history);
+            }
         }
     }
 
-    public class AnalysisRecord
+    public class AnalysisRecord : IExposable
     {
         public int Tick;
         public string Prompt;
         public string Response;
         public bool IsError;
         public int ActionCount;
+
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref Tick, "tick");
+            Scribe_Values.Look(ref Prompt, "prompt");
+            Scribe_Values.Look(ref Response, "response");
+            Scribe_Values.Look(ref IsError, "isError");
+            Scribe_Values.Look(ref ActionCount, "actionCount");
+        }
     }
 
-    public class ExecutionLogEntry
+    public class ExecutionLogEntry : IExposable
     {
         public int Tick;
         public string ActionType;
         public string Description;
         public bool Success;
         public string Message;
+
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref Tick, "tick");
+            Scribe_Values.Look(ref ActionType, "actionType");
+            Scribe_Values.Look(ref Description, "description");
+            Scribe_Values.Look(ref Success, "success");
+            Scribe_Values.Look(ref Message, "message");
+        }
     }
 }
