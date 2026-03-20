@@ -2,23 +2,58 @@
 <ModMetaData>
   <name>Vibe Playing - AI Colony Advisor</name>
   <author>wuxie</author>
+  <url>https://github.com/Wuxie233/rimworld-vibe-mod</url>
   <packageId>wuxie.vibeplaying</packageId>
   <supportedVersions>
     <li>1.5</li>
   </supportedVersions>
-  <description>Let AI manage your colony. You decide what to do, AI figures out how.
+  <description>AI-powered colony management advisor for RimWorld.
+You decide WHAT to do — AI figures out HOW.
 
-Connect to any OpenAI-compatible LLM API to get real-time colony analysis, strategic advice, and (optionally) automated execution of plans.
+Connect to any OpenAI-compatible LLM API (OpenAI, Ollama, Groq, etc.) for real-time colony analysis, strategic recommendations, and automated action execution.
 
-Features:
-- Natural language strategy input
-- Colony state analysis and reporting
-- Work priority optimization suggestions
-- Building and zone planning
-- Configurable API endpoint (OpenAI, Ollama, etc.)
+[h2]Core Features[/h2]
+[list]
+[*] Natural language strategy input — type goals like "prepare for winter" or "expand defenses"
+[*] 8 action types: work priorities, blueprints, building templates, zones, designations, bills, draft/undraft, reports
+[*] 7 predefined room templates: bedroom, barracks, kitchen, hospital, killbox, storage, research
+[*] SSE streaming responses — watch AI think in real-time
+[*] Event-driven analysis — AI reacts to raids and mental breaks automatically
+[*] Per-action auto-execution with safety limits per cycle
+[*] Mod-aware: runtime def discovery ensures compatibility with modded content
+[*] Full save/load persistence for analysis history and execution log
+[*] Keyboard shortcuts: F8 open window, F9 quick analyze
+[*] Bilingual: English + Simplified Chinese
+[/list]
+
+[h2]How It Works[/h2]
+1. Configure your LLM API in Mod Settings (works with Ollama locally or any cloud API)
+2. Open the Vibe AI panel and describe your strategy
+3. Review AI analysis and proposed actions
+4. Approve, reject, or let auto-execute handle it
+
+[h2]Requirements[/h2]
+[list]
+[*] RimWorld 1.5+
+[*] An OpenAI-compatible LLM API endpoint (Ollama recommended for local use)
+[*] HugsLib is NOT required
+[/list]
+
+[h2]Compatibility[/h2]
+This mod uses Harmony patches (Postfix only) and does not modify core game logic. It should be compatible with most other mods. The def discovery system automatically detects modded WorkTypes, buildings, recipes, and plants.
+
+[h2]Source Code[/h2]
+https://github.com/Wuxie233/rimworld-vibe-mod
   </description>
-  <modDependencies />
+  <modDependencies>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+    </li>
+  </modDependencies>
   <loadAfter>
     <li>ludeon.rimworld</li>
+    <li>brrainz.harmony</li>
   </loadAfter>
 </ModMetaData>
