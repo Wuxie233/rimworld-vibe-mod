@@ -36,6 +36,8 @@ namespace VibePlaying
                 ResearchSerializer.Append(sb, map);
                 sb.Append(',');
                 BuildingSerializer.Append(sb, map);
+                sb.Append(',');
+                PowerSerializer.Append(sb, map);
             }
 
             sb.Append('}');

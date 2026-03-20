@@ -125,13 +125,30 @@ namespace VibePlaying
         private void DrawAnalysisHistory(Rect rect, VibePlayingComponent comp)
         {
             var history = comp.History;
-            if (history.Count == 0)
+            bool streaming = LLMClient.IsStreaming;
+            var streamText = streaming ? LLMClient.StreamingText : null;
+
+            if (!streaming && history.Count == 0)
             {
                 Widgets.Label(rect, "VibePlaying_NoHistory".Translate());
                 return;
             }
 
             float contentHeight = 0f;
+
+            // Calculate streaming block height
+            float streamHeight = 0f;
+            if (streaming && !string.IsNullOrEmpty(streamText))
+            {
+                streamHeight = 24f + Text.CalcHeight(streamText, rect.width - 24f) + 10f;
+                contentHeight += streamHeight;
+            }
+            else if (streaming)
+            {
+                streamHeight = 40f;
+                contentHeight += streamHeight;
+            }
+
             foreach (var record in history)
                 contentHeight += CalcRecordHeight(record, rect.width - 20f) + 10f;
 
@@ -139,6 +156,29 @@ namespace VibePlaying
             Widgets.BeginScrollView(rect, ref scrollPos, viewRect);
 
             float y = 0f;
+
+            // Draw live streaming block
+            if (streaming)
+            {
+                var streamRect = new Rect(0, y, viewRect.width, streamHeight);
+                Widgets.DrawBoxSolid(streamRect, new Color(0.15f, 0.2f, 0.15f, 0.4f));
+
+                Text.Font = GameFont.Tiny;
+                GUI.color = Color.cyan;
+                Widgets.Label(new Rect(4f, y + 2f, viewRect.width - 8f, 20f),
+                    "VibePlaying_Analyzing".Translate().ToString() + " ▌");
+                GUI.color = Color.white;
+                Text.Font = GameFont.Small;
+
+                if (!string.IsNullOrEmpty(streamText))
+                {
+                    var bodyRect = new Rect(4f, y + 22f, viewRect.width - 8f, streamHeight - 24f);
+                    Widgets.Label(bodyRect, streamText);
+                }
+
+                y += streamHeight + 10f;
+            }
+
             for (int i = 0; i < history.Count; i++)
             {
                 var record = history[i];

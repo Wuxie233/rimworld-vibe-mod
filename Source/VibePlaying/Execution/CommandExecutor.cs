@@ -18,6 +18,8 @@ namespace VibePlaying
             Register(new DesignateHandler());
             Register(new QueueBillHandler());
             Register(new SendReportHandler());
+            Register(new CreateZoneHandler());
+            Register(new SetDraftHandler());
         }
 
         private void Register(IActionHandler handler)

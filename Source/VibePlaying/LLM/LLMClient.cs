@@ -9,10 +9,20 @@ namespace VibePlaying
 {
     /// <summary>
     /// Async HTTP client for OpenAI-compatible chat completion APIs.
+    /// Supports both streaming (SSE) and non-streaming modes.
     /// Uses WebRequest + ThreadPool to avoid blocking the Unity main thread.
+    /// Includes retry with exponential backoff.
     /// </summary>
     public static class LLMClient
     {
+        private const int MaxRetries = 3;
+        private static readonly int[] RetryDelaysMs = { 1000, 3000, 8000 };
+
+        // Volatile field for streaming partial text — UI reads from main thread
+        private static volatile string _streamingText = "";
+        public static string StreamingText => _streamingText;
+        public static volatile bool IsStreaming;
+
         private const string SystemPrompt = @"You are an expert RimWorld colony management AI advisor.
 
 Your role:
@@ -41,6 +51,13 @@ You can propose actions the player can approve. Available action types:
 5. send_report — Send in-game notification
    params: {""title"": ""..."", ""content"": ""..."", ""severity"": ""info|warning|critical""}
 
+6. create_zone — Create a stockpile or growing zone
+   params: {""zone_type"": ""stockpile|growing"", ""x"": ""50"", ""z"": ""50"", ""width"": ""5"", ""height"": ""5""}
+   For growing zones, add: ""plant_def"": ""PlantRice""
+
+7. set_draft — Draft or undraft a colonist for combat
+   params: {""pawn_name"": ""Name"", ""drafted"": ""true""}
+
 Output format:
 First write your analysis text (status summary, critical issues, recommendations).
 Then if you have specific executable actions, add them in a fenced block:
@@ -62,77 +79,136 @@ Rules:
             VibePlayingSettings settings,
             Action<string, string> callback)
         {
-            // Build request body
             var effectiveUserMessage = string.IsNullOrEmpty(userPrompt)
                 ? $"Analyze this colony and provide recommendations.\n\nColony State:\n{colonyStateJson}"
                 : $"{userPrompt}\n\nColony State:\n{colonyStateJson}";
 
-            var requestBody = BuildRequestJson(settings, effectiveUserMessage);
+            var requestBody = BuildRequestJson(settings, effectiveUserMessage, stream: true);
+
+            _streamingText = "";
+            IsStreaming = true;
 
             ThreadPool.QueueUserWorkItem(_ =>
             {
-                try
+                string result = null;
+                string error = null;
+
+                for (int attempt = 0; attempt <= MaxRetries; attempt++)
                 {
-                    var request = WebRequest.CreateHttp(settings.apiEndpoint);
-                    request.Method = "POST";
-                    request.ContentType = "application/json";
-                    request.Timeout = settings.timeoutSeconds * 1000;
-                    request.ReadWriteTimeout = settings.timeoutSeconds * 1000;
-
-                    if (!string.IsNullOrEmpty(settings.apiKey))
-                        request.Headers["Authorization"] = $"Bearer {settings.apiKey}";
-
-                    var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
-                    request.ContentLength = bodyBytes.Length;
-
-                    using (var stream = request.GetRequestStream())
-                        stream.Write(bodyBytes, 0, bodyBytes.Length);
-
-                    using (var response = (HttpWebResponse)request.GetResponse())
-                    using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                    try
                     {
-                        var responseText = reader.ReadToEnd();
-                        var content = ExtractContent(responseText);
-                        // Marshal back to main thread via LongEventHandler
-                        LongEventHandler.QueueLongEvent(
-                            () => callback(content, null),
-                            "VibePlaying_ProcessResponse", false, null);
+                        result = DoStreamingRequest(settings, requestBody);
+                        error = null;
+                        break; // success
                     }
-                }
-                catch (WebException ex)
-                {
-                    var errorMsg = ex.Message;
-                    if (ex.Response is HttpWebResponse httpResp)
+                    catch (WebException ex)
                     {
-                        try
+                        error = ex.Message;
+                        if (ex.Response is HttpWebResponse httpResp)
                         {
-                            using (var reader = new StreamReader(httpResp.GetResponseStream(), Encoding.UTF8))
-                                errorMsg = $"HTTP {(int)httpResp.StatusCode}: {reader.ReadToEnd()}";
+                            int code = (int)httpResp.StatusCode;
+                            try
+                            {
+                                using (var reader = new StreamReader(httpResp.GetResponseStream(), Encoding.UTF8))
+                                    error = $"HTTP {code}: {reader.ReadToEnd()}";
+                            }
+                            catch { }
+                            // Don't retry on client errors (4xx) except 429 (rate limit)
+                            if (code >= 400 && code < 500 && code != 429)
+                                break;
                         }
-                        catch { /* use original message */ }
+                        if (attempt < MaxRetries)
+                        {
+                            Thread.Sleep(RetryDelaysMs[attempt]);
+                            _streamingText = "";
+                        }
                     }
-                    LongEventHandler.QueueLongEvent(
-                        () => callback(null, errorMsg),
-                        "VibePlaying_ProcessError", false, null);
+                    catch (Exception ex)
+                    {
+                        error = ex.Message;
+                        if (attempt < MaxRetries)
+                        {
+                            Thread.Sleep(RetryDelaysMs[attempt]);
+                            _streamingText = "";
+                        }
+                    }
                 }
-                catch (Exception ex)
-                {
-                    LongEventHandler.QueueLongEvent(
-                        () => callback(null, ex.Message),
-                        "VibePlaying_ProcessError", false, null);
-                }
+
+                IsStreaming = false;
+                var finalResult = result;
+                var finalError = error;
+                LongEventHandler.QueueLongEvent(
+                    () => callback(finalResult, finalError),
+                    "VibePlaying_ProcessResponse", false, null);
             });
         }
 
-        private static string BuildRequestJson(VibePlayingSettings settings, string userMessage)
+        private static string DoStreamingRequest(VibePlayingSettings settings, string requestBody)
         {
-            // Manual JSON construction to avoid Newtonsoft dependency at runtime.
-            // RimWorld ships with its own JSON handling, but manual is most portable.
+            var request = WebRequest.CreateHttp(settings.apiEndpoint);
+            request.Method = "POST";
+            request.ContentType = "application/json";
+            request.Timeout = settings.timeoutSeconds * 1000;
+            request.ReadWriteTimeout = settings.timeoutSeconds * 1000;
+
+            if (!string.IsNullOrEmpty(settings.apiKey))
+                request.Headers["Authorization"] = $"Bearer {settings.apiKey}";
+
+            var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
+            request.ContentLength = bodyBytes.Length;
+
+            using (var stream = request.GetRequestStream())
+                stream.Write(bodyBytes, 0, bodyBytes.Length);
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            {
+                var contentType = response.ContentType ?? "";
+                // Check if server actually returned SSE stream
+                if (contentType.Contains("text/event-stream") || contentType.Contains("text/plain"))
+                {
+                    return ReadSSEStream(reader);
+                }
+                else
+                {
+                    // Non-streaming fallback
+                    var responseText = reader.ReadToEnd();
+                    var content = ExtractContent(responseText);
+                    _streamingText = content;
+                    return content;
+                }
+            }
+        }
+
+        private static string ReadSSEStream(StreamReader reader)
+        {
+            var sb = new StringBuilder();
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (!line.StartsWith("data: ")) continue;
+                var data = line.Substring(6);
+                if (data == "[DONE]") break;
+
+                // Extract delta content from the SSE chunk
+                var delta = ExtractDelta(data);
+                if (delta != null)
+                {
+                    sb.Append(delta);
+                    _streamingText = sb.ToString();
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static string BuildRequestJson(VibePlayingSettings settings, string userMessage, bool stream)
+        {
             var sb = new StringBuilder(512);
             sb.Append('{');
             sb.Append($"\"model\":\"{EscapeJson(settings.model)}\",");
             sb.Append($"\"max_tokens\":{settings.maxTokens},");
             sb.Append($"\"temperature\":{settings.temperature:F2},");
+            if (stream) sb.Append("\"stream\":true,");
             sb.Append("\"messages\":[");
             sb.Append($"{{\"role\":\"system\",\"content\":\"{EscapeJson(SystemPrompt)}\"}},");
             sb.Append($"{{\"role\":\"user\",\"content\":\"{EscapeJson(userMessage)}\"}}");
@@ -141,16 +217,47 @@ Rules:
         }
 
         /// <summary>
-        /// Extract the assistant message content from an OpenAI-format response.
-        /// Lightweight parsing without a full JSON library.
+        /// Extract delta.content from SSE chunk: {"choices":[{"delta":{"content":"text"}}]}
         /// </summary>
+        private static string ExtractDelta(string json)
+        {
+            const string marker = "\"content\":\"";
+            int idx = json.IndexOf("\"delta\"");
+            if (idx < 0) return null;
+            int start = json.IndexOf(marker, idx);
+            if (start < 0) return null;
+            start += marker.Length;
+
+            var sb = new StringBuilder();
+            bool escape = false;
+            for (int i = start; i < json.Length; i++)
+            {
+                char c = json[i];
+                if (escape)
+                {
+                    switch (c)
+                    {
+                        case 'n': sb.Append('\n'); break;
+                        case 't': sb.Append('\t'); break;
+                        case '\\': sb.Append('\\'); break;
+                        case '"': sb.Append('"'); break;
+                        default: sb.Append('\\'); sb.Append(c); break;
+                    }
+                    escape = false;
+                }
+                else if (c == '\\') escape = true;
+                else if (c == '"') break;
+                else sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
         private static string ExtractContent(string responseJson)
         {
-            // Look for "content":"..." in the response
             const string marker = "\"content\":\"";
             int start = responseJson.LastIndexOf(marker);
             if (start < 0)
-                return responseJson; // fallback: return raw
+                return responseJson;
 
             start += marker.Length;
             var sb = new StringBuilder();
@@ -170,18 +277,9 @@ Rules:
                     }
                     escape = false;
                 }
-                else if (c == '\\')
-                {
-                    escape = true;
-                }
-                else if (c == '"')
-                {
-                    break;
-                }
-                else
-                {
-                    sb.Append(c);
-                }
+                else if (c == '\\') escape = true;
+                else if (c == '"') break;
+                else sb.Append(c);
             }
             return sb.ToString();
         }
