@@ -26,6 +26,8 @@ namespace VibePlaying
                 ResourceSerializer.Append(sb, map);
                 sb.Append(',');
                 ThreatSerializer.Append(sb, map);
+                sb.Append(',');
+                DefDiscovery.Append(sb, map);
             }
 
             if (level >= DetailLevel.L2)

@@ -20,6 +20,7 @@ namespace VibePlaying
             Register(new SendReportHandler());
             Register(new CreateZoneHandler());
             Register(new SetDraftHandler());
+            Register(new PlaceTemplateHandler());
         }
 
         private void Register(IActionHandler handler)

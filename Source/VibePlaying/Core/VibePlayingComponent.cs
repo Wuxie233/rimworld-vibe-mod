@@ -62,7 +62,7 @@ namespace VibePlaying
             var stateJson = ColonyStateExtractor.Extract(map, DetailLevel.L1);
             var effectivePrompt = string.IsNullOrEmpty(userPrompt) ? CurrentStrategy : userPrompt;
 
-            LLMClient.AnalyzeAsync(stateJson, effectivePrompt, VibePlayingMod.Settings,
+            LLMClient.AnalyzeAsync(stateJson, effectivePrompt, VibePlayingMod.Settings, history,
                 (response, error) =>
                 {
                     analysisInProgress = false;

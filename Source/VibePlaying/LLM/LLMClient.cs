@@ -58,6 +58,11 @@ You can propose actions the player can approve. Available action types:
 7. set_draft — Draft or undraft a colonist for combat
    params: {""pawn_name"": ""Name"", ""drafted"": ""true""}
 
+8. place_template — Place a predefined building template
+   params: {""template"": ""bedroom"", ""x"": ""50"", ""z"": ""50"", ""stuff"": ""BlocksGranite""}
+   Available templates: bedroom (3x4), barracks (5x7), kitchen (4x4), hospital (4x5), killbox (11x5), storage (5x5), research (4x4)
+   PREFER templates over individual place_blueprint for room construction.
+
 Output format:
 First write your analysis text (status summary, critical issues, recommendations).
 Then if you have specific executable actions, add them in a fenced block:
@@ -77,13 +82,14 @@ Rules:
             string colonyStateJson,
             string userPrompt,
             VibePlayingSettings settings,
+            System.Collections.Generic.IReadOnlyList<AnalysisRecord> history,
             Action<string, string> callback)
         {
             var effectiveUserMessage = string.IsNullOrEmpty(userPrompt)
                 ? $"Analyze this colony and provide recommendations.\n\nColony State:\n{colonyStateJson}"
                 : $"{userPrompt}\n\nColony State:\n{colonyStateJson}";
 
-            var requestBody = BuildRequestJson(settings, effectiveUserMessage, stream: true);
+            var requestBody = BuildRequestJson(settings, effectiveUserMessage, history, stream: true);
 
             _streamingText = "";
             IsStreaming = true;
@@ -201,7 +207,8 @@ Rules:
             return sb.ToString();
         }
 
-        private static string BuildRequestJson(VibePlayingSettings settings, string userMessage, bool stream)
+        private static string BuildRequestJson(VibePlayingSettings settings, string userMessage,
+            System.Collections.Generic.IReadOnlyList<AnalysisRecord> history, bool stream)
         {
             var sb = new StringBuilder(512);
             sb.Append('{');
@@ -210,8 +217,30 @@ Rules:
             sb.Append($"\"temperature\":{settings.temperature:F2},");
             if (stream) sb.Append("\"stream\":true,");
             sb.Append("\"messages\":[");
-            sb.Append($"{{\"role\":\"system\",\"content\":\"{EscapeJson(SystemPrompt)}\"}},");
-            sb.Append($"{{\"role\":\"user\",\"content\":\"{EscapeJson(userMessage)}\"}}");
+            sb.Append($"{{\"role\":\"system\",\"content\":\"{EscapeJson(SystemPrompt)}\"}}");
+
+            // Include last 2 analysis records as conversation context
+            if (history != null)
+            {
+                int count = 0;
+                for (int i = 0; i < history.Count && count < 2; i++)
+                {
+                    var record = history[i];
+                    if (record.IsError) continue;
+
+                    // Reconstruct the user prompt
+                    var prompt = string.IsNullOrEmpty(record.Prompt) ? "Analyze colony" : record.Prompt;
+                    sb.Append($",{{\"role\":\"user\",\"content\":\"{EscapeJson(prompt)}\"}}");
+
+                    // Truncate long responses to save tokens
+                    var response = record.Response ?? "";
+                    if (response.Length > 800) response = response.Substring(0, 800) + "...(truncated)";
+                    sb.Append($",{{\"role\":\"assistant\",\"content\":\"{EscapeJson(response)}\"}}");
+                    count++;
+                }
+            }
+
+            sb.Append($",{{\"role\":\"user\",\"content\":\"{EscapeJson(userMessage)}\"}}");
             sb.Append("]}");
             return sb.ToString();
         }
