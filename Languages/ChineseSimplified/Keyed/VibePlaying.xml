@@ -26,6 +26,18 @@
   <VibePlaying_History>分析历史</VibePlaying_History>
   <VibePlaying_NoHistory>暂无分析记录。点击"分析殖民地"开始。</VibePlaying_NoHistory>
 
+  <VibePlaying_ClearResolved>清除已处理</VibePlaying_ClearResolved>
+
+  <!-- 标签页 -->
+  <VibePlaying_TabAnalysis>分析</VibePlaying_TabAnalysis>
+  <VibePlaying_TabActions>操作</VibePlaying_TabActions>
+  <VibePlaying_TabLog>日志</VibePlaying_TabLog>
+
+  <!-- 操作 -->
+  <VibePlaying_NoActions>没有待处理操作。运行一次分析来获取 AI 建议。</VibePlaying_NoActions>
+  <VibePlaying_ApproveAll>全部批准</VibePlaying_ApproveAll>
+  <VibePlaying_NoLog>暂无执行记录。</VibePlaying_NoLog>
+
   <!-- 预设 -->
   <VibePlaying_Preset_Food>🌾 食物与营养</VibePlaying_Preset_Food>
   <VibePlaying_Preset_Defense>🛡️ 防御分析</VibePlaying_Preset_Defense>

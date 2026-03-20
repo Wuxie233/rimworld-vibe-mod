@@ -26,6 +26,18 @@
   <VibePlaying_History>Analysis History</VibePlaying_History>
   <VibePlaying_NoHistory>No analysis yet. Click "Analyze Colony" to start.</VibePlaying_NoHistory>
 
+  <VibePlaying_ClearResolved>Clear Resolved</VibePlaying_ClearResolved>
+
+  <!-- Tabs -->
+  <VibePlaying_TabAnalysis>Analysis</VibePlaying_TabAnalysis>
+  <VibePlaying_TabActions>Actions</VibePlaying_TabActions>
+  <VibePlaying_TabLog>Log</VibePlaying_TabLog>
+
+  <!-- Actions -->
+  <VibePlaying_NoActions>No pending actions. Run an analysis to get AI suggestions.</VibePlaying_NoActions>
+  <VibePlaying_ApproveAll>Approve All</VibePlaying_ApproveAll>
+  <VibePlaying_NoLog>No execution history yet.</VibePlaying_NoLog>
+
   <!-- Presets -->
   <VibePlaying_Preset_Food>🌾 Food &amp; Nutrition</VibePlaying_Preset_Food>
   <VibePlaying_Preset_Defense>🛡️ Defense Analysis</VibePlaying_Preset_Defense>
