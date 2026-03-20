@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- 设置 -->
+  <VibePlaying_Settings_APISection>— API 配置 —</VibePlaying_Settings_APISection>
+  <VibePlaying_Settings_Endpoint>API 端点</VibePlaying_Settings_Endpoint>
+  <VibePlaying_Settings_APIKey>API 密钥</VibePlaying_Settings_APIKey>
+  <VibePlaying_Settings_Model>模型</VibePlaying_Settings_Model>
+  <VibePlaying_Settings_MaxTokens>最大 Token 数</VibePlaying_Settings_MaxTokens>
+  <VibePlaying_Settings_Temperature>温度</VibePlaying_Settings_Temperature>
+  <VibePlaying_Settings_Timeout>超时时间</VibePlaying_Settings_Timeout>
+  <VibePlaying_Settings_AutoSection>— 自动化 —</VibePlaying_Settings_AutoSection>
+  <VibePlaying_Settings_AutoAnalyze>启用周期自动分析</VibePlaying_Settings_AutoAnalyze>
+  <VibePlaying_Settings_CycleDays>分析周期（天）</VibePlaying_Settings_CycleDays>
+  <VibePlaying_Settings_SafetySection>— 安全限制 —</VibePlaying_Settings_SafetySection>
+  <VibePlaying_Settings_MaxBlueprints>每周期最大蓝图数</VibePlaying_Settings_MaxBlueprints>
+  <VibePlaying_Settings_MaxDesignations>每周期最大指定数</VibePlaying_Settings_MaxDesignations>
+
+  <!-- 窗口 -->
+  <VibePlaying_Title>氛围游玩 — AI 殖民地顾问</VibePlaying_Title>
+  <VibePlaying_NoGame>没有活跃的游戏。</VibePlaying_NoGame>
+  <VibePlaying_StrategyPrompt>你的策略是什么？（留空则进行通用分析）</VibePlaying_StrategyPrompt>
+  <VibePlaying_Analyze>分析殖民地</VibePlaying_Analyze>
+  <VibePlaying_Analyzing>分析中...</VibePlaying_Analyzing>
+  <VibePlaying_Presets>快捷预设 ▼</VibePlaying_Presets>
+  <VibePlaying_WaitingResponse>等待 AI 响应中...</VibePlaying_WaitingResponse>
+  <VibePlaying_History>分析历史</VibePlaying_History>
+  <VibePlaying_NoHistory>暂无分析记录。点击"分析殖民地"开始。</VibePlaying_NoHistory>
+
+  <!-- 预设 -->
+  <VibePlaying_Preset_Food>🌾 食物与营养</VibePlaying_Preset_Food>
+  <VibePlaying_Preset_Defense>🛡️ 防御分析</VibePlaying_Preset_Defense>
+  <VibePlaying_Preset_Expand>📐 扩张规划</VibePlaying_Preset_Expand>
+  <VibePlaying_Preset_WorkOpt>👷 工作优化</VibePlaying_Preset_WorkOpt>
+  <VibePlaying_Preset_Full>📊 全面分析</VibePlaying_Preset_Full>
+</LanguageData>

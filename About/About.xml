@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Vibe Playing - AI Colony Advisor</name>
+  <author>wuxie</author>
+  <packageId>wuxie.vibeplaying</packageId>
+  <supportedVersions>
+    <li>1.5</li>
+  </supportedVersions>
+  <description>Let AI manage your colony. You decide what to do, AI figures out how.
+
+Connect to any OpenAI-compatible LLM API to get real-time colony analysis, strategic advice, and (optionally) automated execution of plans.
+
+Features:
+- Natural language strategy input
+- Colony state analysis and reporting
+- Work priority optimization suggestions
+- Building and zone planning
+- Configurable API endpoint (OpenAI, Ollama, etc.)
+  </description>
+  <modDependencies />
+  <loadAfter>
+    <li>ludeon.rimworld</li>
+  </loadAfter>
+</ModMetaData>

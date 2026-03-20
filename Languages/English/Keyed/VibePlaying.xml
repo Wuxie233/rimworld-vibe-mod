@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- Settings -->
+  <VibePlaying_Settings_APISection>— API Configuration —</VibePlaying_Settings_APISection>
+  <VibePlaying_Settings_Endpoint>API Endpoint</VibePlaying_Settings_Endpoint>
+  <VibePlaying_Settings_APIKey>API Key</VibePlaying_Settings_APIKey>
+  <VibePlaying_Settings_Model>Model</VibePlaying_Settings_Model>
+  <VibePlaying_Settings_MaxTokens>Max Tokens</VibePlaying_Settings_MaxTokens>
+  <VibePlaying_Settings_Temperature>Temperature</VibePlaying_Settings_Temperature>
+  <VibePlaying_Settings_Timeout>Timeout</VibePlaying_Settings_Timeout>
+  <VibePlaying_Settings_AutoSection>— Automation —</VibePlaying_Settings_AutoSection>
+  <VibePlaying_Settings_AutoAnalyze>Enable auto-analysis every cycle</VibePlaying_Settings_AutoAnalyze>
+  <VibePlaying_Settings_CycleDays>Analysis cycle (days)</VibePlaying_Settings_CycleDays>
+  <VibePlaying_Settings_SafetySection>— Safety Limits —</VibePlaying_Settings_SafetySection>
+  <VibePlaying_Settings_MaxBlueprints>Max blueprints per cycle</VibePlaying_Settings_MaxBlueprints>
+  <VibePlaying_Settings_MaxDesignations>Max designations per cycle</VibePlaying_Settings_MaxDesignations>
+
+  <!-- Window -->
+  <VibePlaying_Title>Vibe Playing — AI Colony Advisor</VibePlaying_Title>
+  <VibePlaying_NoGame>No active game.</VibePlaying_NoGame>
+  <VibePlaying_StrategyPrompt>What's your strategy? (or leave empty for general analysis)</VibePlaying_StrategyPrompt>
+  <VibePlaying_Analyze>Analyze Colony</VibePlaying_Analyze>
+  <VibePlaying_Analyzing>Analyzing...</VibePlaying_Analyzing>
+  <VibePlaying_Presets>Quick Presets ▼</VibePlaying_Presets>
+  <VibePlaying_WaitingResponse>Waiting for AI response...</VibePlaying_WaitingResponse>
+  <VibePlaying_History>Analysis History</VibePlaying_History>
+  <VibePlaying_NoHistory>No analysis yet. Click "Analyze Colony" to start.</VibePlaying_NoHistory>
+
+  <!-- Presets -->
+  <VibePlaying_Preset_Food>🌾 Food &amp; Nutrition</VibePlaying_Preset_Food>
+  <VibePlaying_Preset_Defense>🛡️ Defense Analysis</VibePlaying_Preset_Defense>
+  <VibePlaying_Preset_Expand>📐 Expansion Plan</VibePlaying_Preset_Expand>
+  <VibePlaying_Preset_WorkOpt>👷 Work Optimization</VibePlaying_Preset_WorkOpt>
+  <VibePlaying_Preset_Full>📊 Full Analysis</VibePlaying_Preset_Full>
+</LanguageData>

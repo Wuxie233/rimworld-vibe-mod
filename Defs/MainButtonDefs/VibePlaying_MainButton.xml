@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <MainButtonDef>
+    <defName>VibePlaying</defName>
+    <label>Vibe AI</label>
+    <description>AI colony advisor - analyze your colony and get strategic recommendations.</description>
+    <workerClass>VibePlaying.MainButtonWorker_VibePlaying</workerClass>
+    <order>900</order>
+    <validWithoutMap>false</validWithoutMap>
+    <iconPath>UI/VibePlaying_Tab</iconPath>
+    <minimized>false</minimized>
+  </MainButtonDef>
+</Defs>
