@@ -55,6 +55,23 @@ namespace VibePlaying
 
             listing.Gap();
 
+            // --- Auto-execution per action type ---
+            listing.Label("VibePlaying_Settings_AutoExecSection".Translate());
+            listing.GapLine();
+
+            listing.CheckboxLabeled(
+                "VibePlaying_Settings_AutoExecWork".Translate(), ref Settings.autoExecWorkPriority);
+            listing.CheckboxLabeled(
+                "VibePlaying_Settings_AutoExecBlueprint".Translate(), ref Settings.autoExecBlueprint);
+            listing.CheckboxLabeled(
+                "VibePlaying_Settings_AutoExecDesignate".Translate(), ref Settings.autoExecDesignate);
+            listing.CheckboxLabeled(
+                "VibePlaying_Settings_AutoExecBill".Translate(), ref Settings.autoExecBill);
+            listing.CheckboxLabeled(
+                "VibePlaying_Settings_AutoExecReport".Translate(), ref Settings.autoExecReport);
+
+            listing.Gap();
+
             // --- Safety ---
             listing.Label("VibePlaying_Settings_SafetySection".Translate());
             listing.GapLine();
@@ -64,6 +81,12 @@ namespace VibePlaying
 
             listing.Label("VibePlaying_Settings_MaxDesignations".Translate() + $": {Settings.maxDesignationsPerCycle}");
             Settings.maxDesignationsPerCycle = (int)listing.Slider(Settings.maxDesignationsPerCycle, 5, 200);
+
+            listing.Label("VibePlaying_Settings_MaxBills".Translate() + $": {Settings.maxBillsPerCycle}");
+            Settings.maxBillsPerCycle = (int)listing.Slider(Settings.maxBillsPerCycle, 5, 50);
+
+            listing.Label("VibePlaying_Settings_MaxWorkChanges".Translate() + $": {Settings.maxWorkChangesPerCycle}");
+            Settings.maxWorkChangesPerCycle = (int)listing.Slider(Settings.maxWorkChangesPerCycle, 5, 50);
 
             listing.End();
         }

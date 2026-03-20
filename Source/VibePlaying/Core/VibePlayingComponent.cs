@@ -18,10 +18,12 @@ namespace VibePlaying
         private readonly List<ProposedAction> pendingActions = new List<ProposedAction>();
         private readonly List<ExecutionLogEntry> executionLog = new List<ExecutionLogEntry>();
         private readonly CommandExecutor executor = new CommandExecutor();
+        private readonly SafetyCounter safetyCounter = new SafetyCounter();
 
         public IReadOnlyList<AnalysisRecord> History => history;
         public IReadOnlyList<ProposedAction> PendingActions => pendingActions;
         public IReadOnlyList<ExecutionLogEntry> ExecutionLog => executionLog;
+        public SafetyCounter Safety => safetyCounter;
         public bool IsAnalyzing => analysisInProgress;
         public string CurrentStrategy = "";
 
@@ -34,6 +36,9 @@ namespace VibePlaying
 
             int intervalTicks = VibePlayingMod.Settings.analysisCycleDays * 60000;
             int currentTick = Find.TickManager.TicksGame;
+
+            // Reset safety counters at cycle boundary
+            safetyCounter.ResetIfNewCycle(currentTick, intervalTicks);
 
             if (lastAnalysisTick < 0 || currentTick - lastAnalysisTick >= intervalTicks)
             {
@@ -85,16 +90,41 @@ namespace VibePlaying
                         ActionCount = parsed.Actions.Count
                     });
 
-                    // Add parsed actions to pending list
+                    // Add parsed actions — auto-execute if configured
+                    var settings = VibePlayingMod.Settings;
+                    var currentMap = Find.CurrentMap;
                     foreach (var action in parsed.Actions)
                     {
                         if (string.IsNullOrEmpty(action.Description))
                             action.Description = executor.Describe(action);
+
+                        if (settings.IsAutoExec(action.Type)
+                            && safetyCounter.IsWithinLimit(action.Type, settings)
+                            && currentMap != null)
+                        {
+                            var result = executor.Execute(currentMap, action);
+                            action.Status = result.Success ? ActionStatus.Executed : ActionStatus.Failed;
+                            action.ResultMessage = result.Message;
+                            if (result.Success)
+                                safetyCounter.Increment(action.Type);
+
+                            executionLog.Insert(0, new ExecutionLogEntry
+                            {
+                                Tick = Find.TickManager.TicksGame,
+                                ActionType = action.Type,
+                                Description = "[AUTO] " + action.Description,
+                                Success = result.Success,
+                                Message = result.Message
+                            });
+                        }
+
                         pendingActions.Add(action);
                     }
 
                     while (history.Count > 20)
                         history.RemoveAt(history.Count - 1);
+                    while (executionLog.Count > 50)
+                        executionLog.RemoveAt(executionLog.Count - 1);
                 });
         }
 
@@ -102,6 +132,15 @@ namespace VibePlaying
         {
             if (index < 0 || index >= pendingActions.Count) return;
             var action = pendingActions[index];
+
+            // Safety limit check
+            if (!safetyCounter.IsWithinLimit(action.Type, VibePlayingMod.Settings))
+            {
+                action.Status = ActionStatus.Failed;
+                action.ResultMessage = "Safety limit reached for this cycle";
+                return;
+            }
+
             action.Status = ActionStatus.Approved;
 
             var map = Find.CurrentMap;
@@ -115,6 +154,8 @@ namespace VibePlaying
             var result = executor.Execute(map, action);
             action.Status = result.Success ? ActionStatus.Executed : ActionStatus.Failed;
             action.ResultMessage = result.Message;
+            if (result.Success)
+                safetyCounter.Increment(action.Type);
 
             executionLog.Insert(0, new ExecutionLogEntry
             {

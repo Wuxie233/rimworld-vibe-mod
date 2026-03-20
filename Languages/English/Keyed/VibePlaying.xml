@@ -11,9 +11,17 @@
   <VibePlaying_Settings_AutoSection>— Automation —</VibePlaying_Settings_AutoSection>
   <VibePlaying_Settings_AutoAnalyze>Enable auto-analysis every cycle</VibePlaying_Settings_AutoAnalyze>
   <VibePlaying_Settings_CycleDays>Analysis cycle (days)</VibePlaying_Settings_CycleDays>
-  <VibePlaying_Settings_SafetySection>— Safety Limits —</VibePlaying_Settings_SafetySection>
+  <VibePlaying_Settings_AutoExecSection>— Auto-Execute Actions —</VibePlaying_Settings_AutoExecSection>
+  <VibePlaying_Settings_AutoExecWork>Auto-execute: Work Priority changes</VibePlaying_Settings_AutoExecWork>
+  <VibePlaying_Settings_AutoExecBlueprint>Auto-execute: Building blueprints</VibePlaying_Settings_AutoExecBlueprint>
+  <VibePlaying_Settings_AutoExecDesignate>Auto-execute: Designations (hunt/mine/cut)</VibePlaying_Settings_AutoExecDesignate>
+  <VibePlaying_Settings_AutoExecBill>Auto-execute: Production bills</VibePlaying_Settings_AutoExecBill>
+  <VibePlaying_Settings_AutoExecReport>Auto-execute: Reports/notifications</VibePlaying_Settings_AutoExecReport>
+  <VibePlaying_Settings_SafetySection>— Safety Limits (per cycle) —</VibePlaying_Settings_SafetySection>
   <VibePlaying_Settings_MaxBlueprints>Max blueprints per cycle</VibePlaying_Settings_MaxBlueprints>
   <VibePlaying_Settings_MaxDesignations>Max designations per cycle</VibePlaying_Settings_MaxDesignations>
+  <VibePlaying_Settings_MaxBills>Max production bills per cycle</VibePlaying_Settings_MaxBills>
+  <VibePlaying_Settings_MaxWorkChanges>Max work priority changes per cycle</VibePlaying_Settings_MaxWorkChanges>
 
   <!-- Window -->
   <VibePlaying_Title>Vibe Playing — AI Colony Advisor</VibePlaying_Title>

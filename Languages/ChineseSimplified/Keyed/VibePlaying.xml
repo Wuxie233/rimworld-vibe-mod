@@ -11,9 +11,17 @@
   <VibePlaying_Settings_AutoSection>— 自动化 —</VibePlaying_Settings_AutoSection>
   <VibePlaying_Settings_AutoAnalyze>启用周期自动分析</VibePlaying_Settings_AutoAnalyze>
   <VibePlaying_Settings_CycleDays>分析周期（天）</VibePlaying_Settings_CycleDays>
-  <VibePlaying_Settings_SafetySection>— 安全限制 —</VibePlaying_Settings_SafetySection>
+  <VibePlaying_Settings_AutoExecSection>— 自动执行操作 —</VibePlaying_Settings_AutoExecSection>
+  <VibePlaying_Settings_AutoExecWork>自动执行：工作优先级调整</VibePlaying_Settings_AutoExecWork>
+  <VibePlaying_Settings_AutoExecBlueprint>自动执行：建筑蓝图</VibePlaying_Settings_AutoExecBlueprint>
+  <VibePlaying_Settings_AutoExecDesignate>自动执行：区域指定（狩猎/采矿/砍伐）</VibePlaying_Settings_AutoExecDesignate>
+  <VibePlaying_Settings_AutoExecBill>自动执行：生产单</VibePlaying_Settings_AutoExecBill>
+  <VibePlaying_Settings_AutoExecReport>自动执行：报告通知</VibePlaying_Settings_AutoExecReport>
+  <VibePlaying_Settings_SafetySection>— 安全限制（每周期） —</VibePlaying_Settings_SafetySection>
   <VibePlaying_Settings_MaxBlueprints>每周期最大蓝图数</VibePlaying_Settings_MaxBlueprints>
   <VibePlaying_Settings_MaxDesignations>每周期最大指定数</VibePlaying_Settings_MaxDesignations>
+  <VibePlaying_Settings_MaxBills>每周期最大生产单数</VibePlaying_Settings_MaxBills>
+  <VibePlaying_Settings_MaxWorkChanges>每周期最大工作调整数</VibePlaying_Settings_MaxWorkChanges>
 
   <!-- 窗口 -->
   <VibePlaying_Title>氛围游玩 — AI 殖民地顾问</VibePlaying_Title>
